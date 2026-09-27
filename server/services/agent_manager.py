@@ -1,5 +1,9 @@
 from server.models.agent import Agent
 from server.core.engine import CoreEngine
+from server.rules.cpu_ruler import CPURuler
+from server.rules.process_ruler import ProcessesRuler
+from server.rules.ram_ruler import RAMRuler
+from server.rules.user_ruler import UsersRuler
 import time
 class AgentManager:
 
@@ -162,8 +166,12 @@ class AgentManager:
         engine.cheking(ip, agent.cpu, agent.processes, agent.ram, agent.users )
 
 #RUN FUNCTION TO SCAN WITH THE RULERS ALL THE AGENTS , DOING A FOR IN THE IP
-    def runall(self):
-        engine = CoreEngine()
+    def runall(self): 
+        cpu_rule = CPURuler()
+        process_rule = ProcessesRuler()
+        ram_rule = RAMRuler()
+        user_rule = UsersRuler()
+        engine = CoreEngine(cpu_ruler=cpu_rule,process_ruler=process_rule,ram_ruler=ram_rule,user_ruler=user_rule)
         while True :
             for ip in self.agents:
                 agent = self.get_agent(ip)
