@@ -167,6 +167,8 @@ class AgentManager:
         while True :
             for ip in self.agents:
                 agent = self.get_agent(ip)
+                print ("---CHECKING AGENTS---")
                 engine.cheking(ip, agent.cpu, agent.processes, agent.ram, agent.users)
+                print ("---AGENTS CHECKED---")
             time.sleep(4)
 agent_manager = AgentManager()
