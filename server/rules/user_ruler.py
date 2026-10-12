@@ -1,8 +1,9 @@
+#DEFINING USERS CLASS 
 from server.core.finding import Finding
 
 
 class UsersRuler:
-
+#DEFINING THE FINDING FUNCTION 
     def find(self, ip, severity, title, description):
         return Finding(
             ip=ip,
@@ -10,7 +11,7 @@ class UsersRuler:
             title=title,
             description=description
         )
-
+#CHEKING FOR FINDINGS 
     def check(self, ip, users):
         findings = []
 

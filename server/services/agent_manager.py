@@ -5,6 +5,7 @@ from server.rules.process_ruler import ProcessesRuler
 from server.rules.ram_ruler import RAMRuler
 from server.rules.user_ruler import UsersRuler
 import time
+from server.services.telegram_notifier import send_alert, record_sample, first_available, peek
 class AgentManager:
 
     #Agent constructor , this only contains state info about the agents 
@@ -166,17 +167,41 @@ class AgentManager:
         engine.cheking(ip, agent.cpu, agent.processes, agent.ram, agent.users )
 
 #RUN FUNCTION TO SCAN WITH THE RULERS ALL THE AGENTS , DOING A FOR IN THE IP
-    def runall(self): 
+    # RUN FUNCTION TO SCAN WITH THE RULERS ALL THE AGENTS, DOING A FOR IN THE IP
+    def runall(self):
         cpu_rule = CPURuler()
         process_rule = ProcessesRuler()
         ram_rule = RAMRuler()
         user_rule = UsersRuler()
-        engine = CoreEngine(cpu_ruler=cpu_rule,process_ruler=process_rule,ram_ruler=ram_rule,user_ruler=user_rule)
-        while True :
+        engine = CoreEngine(cpu_ruler=cpu_rule, process_ruler=process_rule, ram_ruler=ram_rule, user_ruler=user_rule)
+        
+        while True:
             for ip in self.agents:
                 agent = self.get_agent(ip)
-                print ("---CHECKING AGENTS---")
-                engine.cheking(ip, agent.cpu, agent.processes, agent.ram, agent.users)
-                print ("---AGENTS CHECKED---")
-            time.sleep(4)
+                print("---CHECKING AGENTS---")
+                DISCOS = ("nvme0n1", "sda", "vda", "xvda", "mmcblk0")
+                REDES  = ("wlp0s20f3", "eth0", "enp0s3", "ens33", "ens18", "wlan0")
+
+                # NUEVO: una muestra por vuelta -> alimenta el histórico del gráfico
+                record_sample(ip, cpu=self.get_cpu(ip), ram=agent.ram,
+                            disk = first_available(self.get_disk, ip, DISCOS))
+
+                findings = engine.cheking(ip, agent.cpu, agent.processes, agent.ram, agent.users)
+                for finding in findings:
+                    target_ip = finding.ip
+                    target_agent = self.get_agent(target_ip)
+
+                    send_alert(
+                        ip=target_ip,
+                        cpu=self.get_cpu(target_ip),
+                        ram=target_agent.ram,                      # NUEVO
+                        disk = first_available(self.get_disk, ip, DISCOS),
+                        network = first_available(self.get_network, ip, REDES),
+                        severity=finding.severity,
+                        title=finding.title,
+                        description=finding.description
+                    )
+
+            print("---AGENTS CHECKED---")
+            time.sleep(2)
 agent_manager = AgentManager()

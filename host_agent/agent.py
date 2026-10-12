@@ -72,16 +72,22 @@ class HostAgent:
             print("Dynamic data collect...")
             ddata = self.get_dynamic_data()
             self.dynamic_data = ddata
-            requests.post(f"{SERVER_URL}/agents/dynamic", json=self.dynamic_data)
-            time.sleep(self.dynamic_collection_interval)
+            try:
+                requests.post(f"{SERVER_URL}/agents/dynamic", json=self.dynamic_data)
+                time.sleep(self.dynamic_collection_interval)
+            except requests.exceptions.RequestException:
+                time.sleep(2)
 
     def get_static_loop(self):
         while True:
             print("Static data collect...")
             sdata = self.get_static_data()
             self.static_data = sdata
-            requests.post(f"{SERVER_URL}/agents/static", json=self.static_data)
-            time.sleep(self.static_collection_interval)
+            try:
+                requests.post(f"{SERVER_URL}/agents/static", json=self.static_data)
+                time.sleep(self.static_collection_interval)
+            except requests.exceptions.RequestException:
+                time.sleep(2)
 
     # THREADS \ THIS THREADS CONTAIN THE MAIN TWO COLLECTS FOR THE AGENT , THE DYNAMIC AND STATIC COLLECT..
 

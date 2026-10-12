@@ -1,7 +1,8 @@
+#DEFINING THE CPU RULER 
 from server.core.finding import Finding
 
 class CPURuler:
-
+#FIND FUNCTION THAT WILL BE RETURNED 
     def find(self, ip, severity, title, description):
         return Finding(
             ip=ip,
@@ -9,14 +10,14 @@ class CPURuler:
             title=title,
             description=description
         )
-
+#CHECK FUNCTION TO SEE THE CPU EVENTS
     def check(self, ip, cpu):
         findings = []
         
-        # Validación de seguridad para evitar KeyErrors si falta alguna clave
+        # VALIDATION FOR NOT GET A KEYERROR RETURN 
         if not isinstance(cpu, dict):
             return findings
-
+        # DEFINING ALL THE MEASURES
         frequency = cpu.get("frequency", {})
         current = frequency.get("current", 0.0)
         maximum = frequency.get("max", 1.0)
@@ -33,7 +34,7 @@ class CPURuler:
         
         times = cpu.get("times", {})
         steal = times.get("steal", 0.0)
-
+        #MAKING THE RULES AND RETURNING FINDS.
         if usage > 80 and ratio < 0.6:
             findings.append(self.find(
                 ip=ip,

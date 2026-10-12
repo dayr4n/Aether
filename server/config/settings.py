@@ -1,0 +1,9 @@
+#AETHER SERVER SETTINGS HERE 
+
+
+#BOT CHAT ID 
+chatID = ''
+
+#BOT TOKEN 
+
+botTOKEN = ''

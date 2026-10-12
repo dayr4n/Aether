@@ -1,3 +1,4 @@
+#AGENT STORE CLASS WITH THIS CLASS WE WILL CREATE THE PC AGENTS THAT WILL BE REGISTERED
 class Agent:
     def __init__(self, ip, version, name):
         self.ip = ip
